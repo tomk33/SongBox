@@ -217,11 +217,11 @@
         </div>
     </div>
     
-    <audio id="audioPlayer"></audio>
+    <audio id="audioPlayer" src="songs/71 Бонсай.mp3"></audio>
     
     <script>
         const songs = [
-            { id: 1, title: 'Test Song', artist: 'SongBox', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' }
+            { id: 1, title: 'Бонсай', artist: 'MONA'}
         ];
         
         let currentSongIndex = 0;
@@ -245,7 +245,7 @@
         function playSong(index) {
             currentSongIndex = index;
             const song = songs[index];
-            audio.src = song.url;
+            // audio.src = song.url;
             audio.play();
             document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
         }
