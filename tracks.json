@@ -1,5 +1,5 @@
 [
-  { "id": 1, "title": "Бонсай", "artist": "MONA", "src": "songs/71 Бонсай.mp3" },
+  { "id": 1, "title": "bonsai", "artist": "MONA", "src": "songs/bonsai.mp3" },
   { "id": 2, "title": "Безусловная любовь", "artist": "MONA", "src": "songs/74 Безусловная любовь.mp3" },
   { "id": 3, "title": "Город дорог", "artist": "MONA", "src": "songs/75 Город дорог.mp3" },
   { "id": 4, "title": "B твоих глазах", "artist": "MONA", "src": "songs/80 В твоих глазах.mp3" },

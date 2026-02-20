@@ -251,52 +251,91 @@
                 .catch(error => console.error('Failed to fetch data:', error));
         }
 
-        let openRequest = indexedDB.open("data_store", 1);
+        const dbName = "data_store";
+        let db;
 
-        openRequest.onupgradeneeded = function() {
-            // triggers if the client had no database
-            // ...perform initialization...
-        };
-
-        openRequest.onerror = function() {
-            console.error("Error", openRequest.error);
-        };
-
-        openRequest.oncomplete = function() {
-            let db = openRequest.result;
-            db.createObjectStore('songs', {autoIncrememt: true});
-
-            let transaction = db.transaction("songs", "readonly");
-            let books = transaction.objectStore("songs");
-
-            fetch('songs/71 Бонсай.mp3') 
-                .then(response => response.blob()) .then(mp3Blob => { 
-                    let song = mp3Blob;
-                })
-                .catch(error => console.error('Failed to fetch song:', error));
-
-            let request = songs.add(song);
-
-            request.oncomplete = function() {
-                console.log("Song retrieved successfully", request.result);
-            };
-
-            request.onerror = function() {
-                console.log("Error", request.error);
-            };
-
-        };
-
+        openDatabase();
         
-        function playSong(index) {
-            currentSongIndex = index;
-            const song = songs[index];
-            // const blob = new Blob([soundBuffer], { type: "audio/mpeg" });
-            // audio.src = window.URL.createObjectURL(blob);
-            audio.src = song.src;
-            audio.play();
-            document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
+        function openDatabase() {
+            let openRequest = indexedDB.open(dbName, 2);
+
+            openRequest.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                console.log("Upgrading database structure...");
+                
+                // Safety check: Only create the store if it doesn't exist
+                if (!db.objectStoreNames.contains("songs")) {
+                    db.createObjectStore("songs", { keyPath: "title" }); 
+                }
+            };
+
+            openRequest.onsuccess = function(event) {
+                console.log("Db ready");
+                db = event.target.result; // This populates your global 'db' variable
+            };
+            
+            openRequest.onerror = (e) => console.error("Database error:", e.target.error);
         }
+
+        // Keep track of the current URL so we can clean it up
+        let currentBlobUrl = null;
+
+        async function playSong(index) {
+            const song = songs[index]; // song.title comes from your tracks.json
+            
+            const tx = db.transaction("songs", "readonly");
+            const store = tx.objectStore("songs");
+            const getReq = store.get(song.title); // Look for this specific title
+
+            getReq.onsuccess = async () => {
+                let blob;
+                if (getReq.result) {
+                    console.log("Playing from IndexedDB (Local)");
+                    blob = getReq.result.data;
+                } else {
+                    console.log("Not in DB, fetching from server...");
+                    const response = await fetch(song.src);
+                    const mp3Blob = await response.blob();
+                    
+                    // Save it with the title so we find it next time
+                    const saveTx = db.transaction("songs", "readwrite");
+                    saveTx.objectStore("songs").put({ title: song.title, data: mp3Blob });
+                    blob = mp3Blob;
+                }
+
+                audio.src = URL.createObjectURL(blob);
+                audio.play();
+            };
+        }
+
+        // function playSong(index) {
+        //     fetch('songs/71 Бонсай.mp3') 
+        //         .then(response => response.blob()) 
+        //         .then(mp3Blob => { 
+        //             console.log("Blob size:", mp3Blob.size, "bytes");
+                    
+        //             const transaction = db.transaction(["songs"], "readwrite");
+        //             const store = transaction.objectStore("songs");
+
+        //             const addRequest = store.add(mp3Blob);
+
+        //             addRequest.onsuccess = () => {
+        //                 console.log("Song blob added to IndexedDB!");
+        //                     currentSongIndex = index;
+        //                     const song = songs[index];
+        //                     // const blob = new Blob([mp3Blob], { type: "audio/mpeg" });
+        //                     audio.src = window.URL.createObjectURL(mp3Blob);
+        //                     audio.src = song.src;
+        //                     audio.play();
+        //                     document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
+        //             };
+
+        //             addRequest.onerror = (e) => {
+        //                 console.error("Error adding song:", e.target.error);
+        //             };
+        //         })
+        //         .catch(error => console.error('Failed to fetch song:', error));
+        // }
         
         document.getElementById('playBtn').addEventListener('click', () => audio.play());
         document.getElementById('pauseBtn').addEventListener('click', () => audio.pause());
