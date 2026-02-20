@@ -217,35 +217,43 @@
         </div>
     </div>
     
-    <audio id="audioPlayer" src="songs/71 Бонсай.mp3"></audio>
+    <audio id="audioPlayer"></audio>
     
     <script>
-        const songs = [
-            { id: 1, title: 'Бонсай', artist: 'MONA'}
-        ];
-        
+        let songs = [];
         let currentSongIndex = 0;
         const audio = document.getElementById('audioPlayer');
         
         function loadSongs() {
             const grid = document.getElementById('songsGrid');
-            songs.forEach((song, index) => {
-                const card = document.createElement('div');
-                card.className = 'song-card';
-                card.innerHTML = `
-                    <div class="song-cover">🎵</div>
-                    <div class="song-title">${song.title}</div>
-                    <div class="song-artist">${song.artist}</div>
-                `;
-                card.addEventListener('click', () => playSong(index));
-                grid.appendChild(card);
-            });
+            fetch('./tracks.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();  
+                })
+                .then(data => {
+                    songs = data;
+                    data.forEach((song, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'song-card';
+                    card.innerHTML = `
+                        <div class="song-cover">🎵</div>
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    `;
+                    card.addEventListener('click', () => playSong(index));
+                    grid.appendChild(card);
+                    });
+                })  
+                .catch(error => console.error('Failed to fetch data:', error));
         }
         
         function playSong(index) {
             currentSongIndex = index;
-            const song = songs[index];
-            // audio.src = song.url;
+            const song = data[index];
+            audio.src = song.src;
             audio.play();
             document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
         }
