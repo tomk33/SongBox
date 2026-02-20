@@ -290,8 +290,9 @@
         function playSong(index) {
             currentSongIndex = index;
             const song = songs[index];
-            const blob = new Blob([soundBuffer], { type: "audio/mpeg" });
-            audio.src = window.URL.createObjectURL(blob);
+            // const blob = new Blob([soundBuffer], { type: "audio/mpeg" });
+            // audio.src = window.URL.createObjectURL(blob);
+            audio.src = song.src;
             audio.play();
             document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
         }
