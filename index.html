@@ -262,7 +262,7 @@
             console.error("Error", openRequest.error);
         };
 
-        openRequest.onsuccess = function() {
+        openRequest.oncomplete = function() {
             let db = openRequest.result;
             db.createObjectStore('songs', {autoIncrememt: true});
 
