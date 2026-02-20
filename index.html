@@ -252,7 +252,7 @@
         
         function playSong(index) {
             currentSongIndex = index;
-            const song = data[index];
+            const song = songs[index];
             audio.src = song.src;
             audio.play();
             document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
