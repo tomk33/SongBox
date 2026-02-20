@@ -173,7 +173,7 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <div class="logo">🎵 SongBox</div>
+            <div class="logo">SongBox</div>
             
             <div class="nav-section">
                 <h3>Menu</h3>
@@ -196,7 +196,7 @@
             <div class="content">
                 <h2 style="margin-bottom: 20px;">Popular Songs</h2>
                 <div class="songs-grid" id="songsGrid">
-                    <!-- Songs will be populated here -->
+                    <!-- Songs are populated here -->
                 </div>
             </div>
             
@@ -223,6 +223,7 @@
         let songs = [];
         let currentSongIndex = 0;
         const audio = document.getElementById('audioPlayer');
+        audio.preload = "auto";
         
         function loadSongs() {
             const grid = document.getElementById('songsGrid');
