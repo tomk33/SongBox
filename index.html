@@ -276,7 +276,7 @@
 
             let request = songs.add(song);
 
-            request.onsuccess = function() {
+            request.oncomplete = function() {
                 console.log("Song retrieved successfully", request.result);
             };
 
