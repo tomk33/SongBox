@@ -250,11 +250,48 @@
                 })  
                 .catch(error => console.error('Failed to fetch data:', error));
         }
+
+        let openRequest = indexedDB.open("data_store", 1);
+
+        openRequest.onupgradeneeded = function() {
+            // triggers if the client had no database
+            // ...perform initialization...
+        };
+
+        openRequest.onerror = function() {
+            console.error("Error", openRequest.error);
+        };
+
+        openRequest.onsuccess = function() {
+            let db = openRequest.result;
+            db.createObjectStore('songs', {autoIncrememt: true});
+
+            let transaction = db.transaction("songs", "readonly");
+            let books = transaction.objectStore("songs");
+
+            fetch('songs/71 Бонсай.mp3') 
+                .then(response => response.blob()) .then(mp3Blob => { 
+                    let song = mp3Blob;
+                });
+
+            let request = songs.add(song);
+
+            request.onsuccess = function() {
+                console.log("Song retrieved successfully", request.result);
+            };
+
+            request.onerror = function() {
+                console.log("Error", request.error);
+            };
+
+        };
+
         
         function playSong(index) {
             currentSongIndex = index;
             const song = songs[index];
-            audio.src = song.src;
+            const blob = new Blob([soundBuffer], { type: "audio/mpeg" });
+            audio.src = window.URL.createObjectURL(blob);
             audio.play();
             document.getElementById('currentSong').textContent = `${song.title} - ${song.artist}`;
         }
