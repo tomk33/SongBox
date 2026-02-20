@@ -272,7 +272,8 @@
             fetch('songs/71 Бонсай.mp3') 
                 .then(response => response.blob()) .then(mp3Blob => { 
                     let song = mp3Blob;
-                });
+                })
+                .catch(error => console.error('Failed to fetch song:', error));
 
             let request = songs.add(song);
 
